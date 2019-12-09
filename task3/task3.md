@@ -1,4 +1,4 @@
-###Explanation
+### Explanation
 
 I have used the [CPU-plugin](https://github.com/fluent/fluent-bit-docs/blob/master/input/cpu.md) and used it to  gather the overall usage and show the information to the output.
 
@@ -8,9 +8,14 @@ I have created two filters for the task.
 
 - The second filter is a lua script that appends the tag name.
 
-The ouput points to stdout that shows the event as a JSON blob.
+The ouput points to stdout that shows the event as a JSON.
 
 ```
+[SERVICE]
+    Flush           5
+    Daemon          off
+    Log_Level       debug
+
 [INPUT]
     Name cpu
     Tag  my_cpu
@@ -28,8 +33,7 @@ The ouput points to stdout that shows the event as a JSON blob.
 
 [OUTPUT]
     Name  stdout
-    Format        json
+    Format        json_lines
     Match *
 
 ```
-
