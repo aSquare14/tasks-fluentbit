@@ -25,6 +25,15 @@ struct data {
 	struct mk_list mk_list_head;
 };
 
+/* Add a Node */
+void add(int arg, struct mk_list *head)
+{
+    struct data *headPtr = (struct data *)malloc(sizeof(struct data));
+    headPtr->id = arg;
+    mk_list_add(&headPtr->mk_list_head, head);
+}
+
+/* Delete a Node */
 int delete(int arg, struct mk_list *head)
 {
     struct mk_list *iter, *q;
@@ -34,22 +43,37 @@ int delete(int arg, struct mk_list *head)
         objPtr = mk_list_entry(iter, struct data,mk_list_head);
         if(objPtr->id == arg) {
             mk_list_del(&objPtr->mk_list_head);
+            free(objPtr);
             return 1;
         }
     }
     return 0;
 }
 
+/* Print List */
 void print(struct mk_list *head)
 {
-    struct mk_list *iter;
+    struct mk_list *iter, *q;
     struct data *objPtr;
 
-    mk_list_foreach(iter, head) {
+    mk_list_foreach_safe(iter, q, head) {
         objPtr = mk_list_entry(iter, struct data,mk_list_head);
         printf("%d ", objPtr->id);
     }
     printf("\n");
+}
+
+/* Destroy safely traverses through the list, and deletes the nodes */
+void destroy(struct mk_list *head)
+{
+    struct mk_list *iter, *q;
+    struct data *objPtr;
+
+    mk_list_foreach_safe(iter, q, head) {
+        objPtr = mk_list_entry(iter, struct data,mk_list_head);
+        mk_list_del(&objPtr->mk_list_head);
+        free(objPtr);
+    }
 }
 
 int main() 
@@ -58,14 +82,9 @@ int main()
     int i = 0;
     mk_list_init(&fooHead);
 
-    static struct data arr[20];
-    for(i = 0; i < 20; i++) {
-        arr[i].id = i;;
-    }
-
     /* Add nodes to linked list */
     for(i = 1; i <=10; i++)
-         mk_list_add(&(arr[i].mk_list_head), &fooHead);
+        add(i,&fooHead);
     
     /* The Linked List after inserting nodes */
     printf("Original Linked List:\n");
@@ -75,4 +94,7 @@ int main()
     printf("Linked List after deleted node 5:\n");
     delete(5, &fooHead);
     print(&fooHead); 
+
+    /* Free the memory allocated to nodes */
+    destroy(&fooHead);
 }
